@@ -6,39 +6,46 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static boolean solveAnagrams(String first, String second ) {
-        // 길이가 같다
-        if( first.length() == second.length() ){
-            //각 단어가 들어간 dict 객체를 생성
-            Map<Character, Integer> dict = new HashMap();
-            for( char c : first.toCharArray() ){
-                dict.compute(c, (k, v) -> (v == null) ? 1 : v + 1); // 해당 키에 대한 값을 1 증가시킴
-            }
-            for( char c : second.toCharArray() ){
-                dict.compute(c, (k, v) -> (v == null) ? null : v - 1); // 해당 키에 대한 값을 1 감소시킴
-            }
-            for (Integer value : dict.values()) {
-                if (value != 0) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
+    private static int[] countVisitors( int[] visitors, int days ) {
+        int sum = 0;
+        int countMax = 1;
 
-        /* -------------------- END OF INSERTION --------------------*/
+        for (int i = 0; i < days; i++) {
+            sum += visitors[i];
+        }
+        int max = sum;
+        System.out.println("first sum="+sum);
+
+        for (int i = 1; i <= visitors.length-days; i++) {
+            sum = sum - visitors[i - 1] + visitors[i+days-1];
+            //sum += visitors[i] - visitors[i - days];
+            System.out.println(i+"번째 sum="+sum);
+            if( sum !=0 && sum==max ){
+                countMax++;
+            } else if (sum > max){
+                max = sum;
+            }
+        }
+
+        return new int[]{max, countMax};
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+        int totalDays = sc.nextInt(); // 블로그 시작하고 지난 일수
+        int unitDays = sc.nextInt(); // 최대 방문자수를 구할 단위
 
-        int numTests = sc.nextInt();
+        int[] visitors = new int[totalDays]; //방문자수를 담은 배열
+        for (int i = 0; i < totalDays; i++) {
+            visitors[i] = sc.nextInt();
+        }
 
-        for (int i = 0; i < numTests; i++) {
-            String first = sc.next().toLowerCase();
-            String second = sc.next().toLowerCase();
-
-            System.out.println(first + " & " + second + " are " + (solveAnagrams(first, second) ? "anagrams." : "NOT anagrams."));
+        int[] answer = countVisitors(visitors, unitDays);
+        if( answer[0] == 0 ){
+            System.out.print("SAD");
+        } else {
+            System.out.println(answer[0]);
+            System.out.println(answer[1]);
         }
     }
 }
